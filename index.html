@@ -11,27 +11,43 @@
     th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
     th { background-color: #f4f4f4; }
     table thead th { position: sticky; top: 0; z-index: 1; }
+    .datos-iniciales{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 80px;
+    }
+    ul {padding-left: 1rem;}
 </style>
 </head>
 <body>
 
 <h2>Calculadora - <b>XORKETS <span style="color: #0F55FF;">FX</span></b></h2>
 
-<form id="formulario">
-    <label>Valor Inicial:</label>
-    <input type="number" id="valorInicial" required><br>
+<div class="datos-iniciales">
+    <form id="formulario">
+        <label>Valor Inicial:</label>
+        <input type="number" id="valorInicial" required><br>
 
-    <label>Fecha Inicial:</label>
-    <input type="date" id="fechaInicial" required><br>
+        <label>Fecha Inicial:</label>
+        <input type="date" id="fechaInicial" required><br>
 
-    <label>Fecha Final:</label>
-    <input type="date" id="fechaFinal" required><br>
+        <label>Fecha Final:</label>
+        <input type="date" id="fechaFinal" required><br>
 
-    <label>Porcentaje (%):</label>
-    <input type="number" id="porcentaje" required step="0.01"><br>
+        <label>Porcentaje (%):</label>
+        <input type="number" id="porcentaje" required step="0.01"><br>
 
-    <button type="submit" class="btn btn-primary">Calcular</button>
-</form>
+        <button type="submit" class="btn btn-primary">Calcular</button>
+    </form>
+    <div id="valorFinal">
+        
+    </div>
+</div>
+<br>
+<div style="background-color: yellow; padding: 5px 10px;">
+    <i><b>NOTA: </b>Los datos mostrados aquí son netamente aproximaciones. Las ganacias reales se basan en el porcentaje ganado por cada operación realizada. Además, esta es una simulación unicamente sin retiros realizados.</i>
+</div>
+
 
 <table id="tabla">
     <thead>
@@ -50,6 +66,7 @@ document.getElementById("formulario").addEventListener("submit", function(e) {
     e.preventDefault();
 
     let valor = parseFloat(document.getElementById("valorInicial").value);
+    let valorInicial = parseFloat(document.getElementById("valorInicial").value);
     let fechaInicio = new Date(document.getElementById("fechaInicial").value);
     let fechaFin = new Date(document.getElementById("fechaFinal").value);
     let porcentaje = parseFloat(document.getElementById("porcentaje").value) / 100;
@@ -98,7 +115,22 @@ document.getElementById("formulario").addEventListener("submit", function(e) {
 
         fechaActual.setDate(fechaActual.getDate() + 1);
     }
+
+    let valorFinal = document.getElementById("valorFinal");
+    let rendimiento = ((valor - valorInicial) / valorInicial) * 100;
+    let ganancia = (valor - valorInicial);
+    let valorFinalhtml = `
+        <p><b style="color: green; font-size: 40px;">$${valor.toFixed(2)}</b></p>
+        <ul>
+            <li>Inversión inicial: <b>$${valorInicial.toFixed(2)}</b></li> 
+            <li>Ganancia acumulada: <b>$${ganancia.toFixed(2)}</b></li> 
+            <li>Rendimiento: <b>+${rendimiento.toFixed(2)}%</b></li>    
+        </ul>
+    `;
+    
+    valorFinal.innerHTML = valorFinalhtml;
 });
+    
 </script>
 
 </body>
