@@ -17,6 +17,10 @@
         gap: 80px;
     }
     ul {padding-left: 1rem;}
+    select {
+        width: 180px;
+        height: 35px;
+    }
 </style>
 </head>
 <body>
@@ -37,6 +41,13 @@
         <label>Porcentaje (%):</label>
         <input type="number" id="porcentaje" required step="0.01"><br>
 
+        <label>Operaciones al día</label>
+        <select name="operaciones" id="operaciones">
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+        </select>
+        <br><br>
+
         <button type="submit" class="btn btn-primary">Calcular</button>
     </form>
     <div id="valorFinal">
@@ -53,9 +64,10 @@
     <thead>
         <tr>
             <th>Fecha</th>
+            <th>Operación</th>
             <th>Valor</th>
             <th>Decenas</th>
-            <th>Ganancia diaria</th>
+            <th>Ganancia</th>
         </tr>
     </thead>
     <tbody></tbody>
@@ -66,10 +78,13 @@ document.getElementById("formulario").addEventListener("submit", function(e) {
     e.preventDefault();
 
     let valor = parseFloat(document.getElementById("valorInicial").value);
-    let valorInicial = parseFloat(document.getElementById("valorInicial").value);
+    let valorInicial = valor;
+
     let fechaInicio = new Date(document.getElementById("fechaInicial").value);
     let fechaFin = new Date(document.getElementById("fechaFinal").value);
+
     let porcentaje = parseFloat(document.getElementById("porcentaje").value) / 100;
+    let operaciones = parseInt(document.getElementById("operaciones").value);
 
     // Ajustar fecha inicial
     if (fechaInicio.getDay() === 5) { // viernes
@@ -94,23 +109,34 @@ document.getElementById("formulario").addEventListener("submit", function(e) {
 
         let dia = fechaActual.getDay();
 
-        // Solo domingo(0) a jueves(4)
+        // Domingo(0) a Jueves(4)
         if (dia >= 0 && dia <= 4) {
 
-            let ganancia = valor * porcentaje;
-            let decenas = Math.floor(valor / 10) * 10;
+            for (let op = 1; op <= operaciones; op++) {
 
-            let fila = `
-                <tr>
-                    <td>${fechaActual.toISOString().split('T')[0]}</td>
-                    <td>${valor.toFixed(2)}</td>
-                    <td>${decenas}</td>
-                    <td>${ganancia.toFixed(2)}</td>
-                </tr>
-            `;
-            tbody.innerHTML += fila;
+                let valorAntes = valor;
 
-            valor += ganancia; // acumulación
+                // Calcular decenas
+                let decenas = Math.floor(valorAntes / 10) * 10;
+
+                // La ganancia se calcula sobre las decenas
+                let ganancia = decenas * porcentaje;
+
+                let fila = `
+                    <tr>
+                        <td>${fechaActual.toISOString().split('T')[0]}</td>
+                        <td>${op}</td>
+                        <td>${valorAntes.toFixed(2)}</td>
+                        <td>${decenas.toFixed(2)}</td>
+                        <td>${ganancia.toFixed(2)}</td>
+                    </tr>
+                `;
+
+                tbody.innerHTML += fila;
+
+                // Acumular para la siguiente operación
+                valor += ganancia;
+            }
         }
 
         fechaActual.setDate(fechaActual.getDate() + 1);
@@ -118,19 +144,22 @@ document.getElementById("formulario").addEventListener("submit", function(e) {
 
     let valorFinal = document.getElementById("valorFinal");
     let rendimiento = ((valor - valorInicial) / valorInicial) * 100;
-    let ganancia = (valor - valorInicial);
-    let valorFinalhtml = `
-        <p><b style="color: green; font-size: 40px;">$${valor.toFixed(2)}</b></p>
+    let gananciaTotal = valor - valorInicial;
+
+    valorFinal.innerHTML = `
+        <p>
+            <b style="color: green; font-size: 40px;">
+                $${valor.toFixed(2)}
+            </b>
+        </p>
+
         <ul>
-            <li>Inversión inicial: <b>$${valorInicial.toFixed(2)}</b></li> 
-            <li>Ganancia acumulada: <b>$${ganancia.toFixed(2)}</b></li> 
-            <li>Rendimiento: <b>+${rendimiento.toFixed(2)}%</b></li>    
+            <li>Inversión inicial: <b>$${valorInicial.toFixed(2)}</b></li>
+            <li>Ganancia acumulada: <b>$${gananciaTotal.toFixed(2)}</b></li>
+            <li>Rendimiento: <b>+${rendimiento.toFixed(2)}%</b></li>
         </ul>
     `;
-    
-    valorFinal.innerHTML = valorFinalhtml;
 });
-    
 </script>
 
 </body>
